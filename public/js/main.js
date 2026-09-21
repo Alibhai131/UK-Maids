@@ -16,25 +16,70 @@ if (navToggle) {
   });
 }
 
-// Tab Switcher between Candidate and Sponsor Forms
+// Tab Switcher between Sponsor and Candidate Forms
 const btnTabCandidate = document.getElementById('btnTabCandidate');
 const btnTabSponsor = document.getElementById('btnTabSponsor');
 const candidateFormBox = document.getElementById('candidateFormBox');
 const sponsorFormBox = document.getElementById('sponsorFormBox');
 
 if (btnTabCandidate && btnTabSponsor) {
+  btnTabSponsor.addEventListener('click', () => {
+    btnTabSponsor.classList.add('active');
+    btnTabCandidate.classList.remove('active');
+    sponsorFormBox.style.display = 'block';
+    candidateFormBox.style.display = 'none';
+  });
+
   btnTabCandidate.addEventListener('click', () => {
     btnTabCandidate.classList.add('active');
     btnTabSponsor.classList.remove('active');
     candidateFormBox.style.display = 'block';
     sponsorFormBox.style.display = 'none';
   });
+}
 
-  btnTabSponsor.addEventListener('click', () => {
-    btnTabSponsor.classList.add('active');
-    btnTabCandidate.classList.remove('active');
-    sponsorFormBox.style.display = 'block';
-    candidateFormBox.style.display = 'none';
+// UK Sponsor Form Submission (Primary)
+const sponsorForm = document.getElementById('sponsorForm');
+const sSubmitBtn = document.getElementById('sSubmitBtn');
+const sSuccess = document.getElementById('sSuccess');
+
+if (sponsorForm) {
+  sponsorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    sSubmitBtn.disabled = true;
+    sSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+    const payload = {
+      employerName: document.getElementById('sName').value,
+      phone: document.getElementById('sPhone').value,
+      email: document.getElementById('sEmail').value,
+      ukLocation: document.getElementById('sLocation').value,
+      serviceNeeded: document.getElementById('sService').value,
+      liveInOption: document.getElementById('sLiveIn').value,
+      message: document.getElementById('sMessage').value
+    };
+
+    try {
+      const response = await fetch('/api/sponsor-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        sponsorForm.style.display = 'none';
+        sSuccess.style.display = 'block';
+      } else {
+        alert('Error: ' + data.error);
+        sSubmitBtn.disabled = false;
+        sSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Sponsor Inquiry';
+      }
+    } catch (err) {
+      alert('Failed to connect. Please try again.');
+      sSubmitBtn.disabled = false;
+      sSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Sponsor Inquiry';
+    }
   });
 }
 
@@ -86,49 +131,6 @@ if (candidateForm) {
       alert('Failed to connect to server. Please try again.');
       cSubmitBtn.disabled = false;
       cSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
-    }
-  });
-}
-
-// UK Sponsor Form Submission
-const sponsorForm = document.getElementById('sponsorForm');
-const sSubmitBtn = document.getElementById('sSubmitBtn');
-const sSuccess = document.getElementById('sSuccess');
-
-if (sponsorForm) {
-  sponsorForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    sSubmitBtn.disabled = true;
-    sSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-
-    const payload = {
-      employerName: document.getElementById('sName').value,
-      phone: document.getElementById('sPhone').value,
-      email: document.getElementById('sEmail').value,
-      ukLocation: document.getElementById('sLocation').value,
-      serviceNeeded: document.getElementById('sService').value,
-      liveInOption: document.getElementById('sLiveIn').value,
-      message: document.getElementById('sMessage').value
-    };
-
-    try {
-      const response = await fetch('/api/sponsor-inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        sponsorForm.style.display = 'none';
-        sSuccess.style.display = 'block';
-      } else {
-        alert('Error: ' + data.error);
-        sSubmitBtn.disabled = false;
-      }
-    } catch (err) {
-      alert('Failed to connect. Please try again.');
-      sSubmitBtn.disabled = false;
     }
   });
 }
