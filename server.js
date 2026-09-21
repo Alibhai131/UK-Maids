@@ -7,9 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// In-memory data storage (Connect MongoDB or Supabase here later)
+// In-memory data storage
 let candidateRegistrations = [];
 let sponsorInquiries = [];
 
@@ -79,12 +81,13 @@ app.get('/api/admin/submissions', (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
+// Serve index.html for all other routes
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`CleanConnect UK server running on http://localhost:${PORT}`);
+  console.log(`Dania Maids UK server running on http://localhost:${PORT}`);
 });
 
 module.exports = app;
